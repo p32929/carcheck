@@ -22,3 +22,20 @@ const bad = await verifyCar(dirty.buffer);
 console.log('after 1-byte corruption: bad=%d  errors=%d', bad.stats.bad, bad.errors.length);
 assert(bad.stats.bad >= 1, 'corruption went undetected');
 console.log('PASS');
+
+// Wrap the same CARv1 in a CARv2 envelope (pragma + 40-byte header, no index) and re-verify.
+const pragma = Uint8Array.from([0x0a, 0xa1, 0x67, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x02]);
+const hdr = new DataView(new ArrayBuffer(40));
+hdr.setBigUint64(16, 11n + 40n, true);              // dataOffset
+hdr.setBigUint64(24, BigInt(raw.byteLength), true); // dataSize
+const v2 = new Uint8Array(11 + 40 + raw.byteLength);
+v2.set(pragma, 0);
+v2.set(new Uint8Array(hdr.buffer), 11);
+v2.set(new Uint8Array(buf), 51);
+const wrapped = await verifyCar(v2.buffer);
+console.log('CARv%d wrapper: blocks=%d ok=%d bad=%d', wrapped.version, wrapped.stats.total, wrapped.stats.ok, wrapped.stats.bad);
+assert.strictEqual(wrapped.version, 2, 'CARv2 pragma not detected');
+assert.strictEqual(wrapped.stats.ok, good.stats.ok, 'CARv2 wrapper changed the block count');
+assert.strictEqual(wrapped.stats.bad, 0, 'CARv2 wrapper reported corruption');
+assert.deepStrictEqual(wrapped.roots, good.roots, 'CARv2 wrapper lost the roots');
+console.log('PASS (CARv1 + CARv2)');

@@ -58,6 +58,20 @@ node test.js test.car
 It parses the archive, asserts the recomputed CID matches the one requested, then flips a
 single byte and asserts the corruption is caught.
 
+## Paid work
+
+The tool is free (MIT) and stays that way. These are the things people pay me to do with it, fixed price, delivered end to end:
+
+| | What you get | Turnaround |
+|---|---|---|
+| **$500** | **Integrity audit** — send CIDs or a gateway/bucket URL, get every block and declared root verified and a signed report naming exactly what failed and why | 3 working days |
+| **$1,500** | **Self-hosted / white-label verifier** — carcheck under your name and domain, plus a Node CLI and a GitHub Action so CI verifies every archive you produce | 1 week |
+| **$5,000** | **Storage pipeline integrity build** — verification wired into ingest and retrieval: block checks, Piece CID / CommP re-computation, per-deal failure reports, alerting when an archive stops matching its CID | 2–3 weeks |
+
+Start one at **[buymeacoffee.com/p32929](https://buymeacoffee.com/p32929)** — checkout is in units of $5, so pick the
+matching count (100 = $500, 300 = $1,500, 1000 = $5,000) and put `CARCHECK-AUDIT`, `CARCHECK-SELFHOST` or
+`CARCHECK-PIPELINE` plus your email in the message. Everything is scoped in writing before any work starts.
+
 ## License
 
 MIT © [p32929](https://github.com/p32929) — see [LICENSE](LICENSE).

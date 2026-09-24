@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>carcheck — verify an IPFS / Filecoin CAR file in your browser</title>
-<meta name="description" content="Drop a .car file and check every block's CID against its bytes. Runs entirely in your browser — nothing is uploaded.">
+<meta name="description" content="Drop a .car file and check every block's CID against its bytes. Runs entirely in your browser — nothing is uploaded. Paid audits, self-hosted builds and pipeline integration available.">
 <style>
 :root{--bg:#0e1117;--panel:#161b22;--line:#272e3a;--fg:#e6edf3;--dim:#8b949e;--ok:#3fb950;--bad:#f85149;--warn:#d29922;--acc:#58a6ff}
 *{box-sizing:border-box}
@@ -37,6 +37,17 @@ ul.err{margin:10px 0 0;padding-left:20px;color:var(--bad)}
 footer{margin-top:40px;color:var(--dim);font-size:13px;border-top:1px solid var(--line);padding-top:18px}
 a{color:var(--acc)}
 .more{margin-top:10px;color:var(--dim);font-size:13px}
+#paid{margin-top:52px;border-top:1px solid var(--line);padding-top:34px}
+#paid h2{font-size:22px;margin:0 0 6px;letter-spacing:-.01em}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:20px}
+.tier{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.tier .price{font-size:26px;font-weight:700;color:var(--acc);line-height:1.1}
+.tier b{display:block;margin:4px 0 8px}
+.tier p{margin:0 0 8px}
+.tier small{color:var(--dim)}
+.buy{margin-top:20px}
+.buy a{font-weight:650}
+.buy span{display:block;color:var(--dim);font-size:13px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -51,6 +62,42 @@ a{color:var(--acc)}
   <input type="file" id="file" accept=".car,application/vnd.ipld.car">
 
   <div id="out"></div>
+
+
+  <section id="paid">
+    <h2>Need this done for you, on your data?</h2>
+    <p class="sub">The tool above is free and always will be. These are the things people pay me to do with it &mdash;
+    delivered by me, end to end, fixed price, no hourly billing.</p>
+
+    <div class="tiers">
+      <div class="tier">
+        <div class="price">$500</div>
+        <b>Integrity audit</b>
+        <p>You send the CIDs or a gateway/bucket URL. I verify every block and every declared root across your
+        dataset, chase down what fails, and send back a signed report naming the exact bad blocks and why.</p>
+        <small>Turnaround: 3 working days.</small>
+      </div>
+      <div class="tier">
+        <div class="price">$1,500</div>
+        <b>Self-hosted / white-label verifier</b>
+        <p>carcheck rebuilt under your name and domain, plus a Node CLI and a GitHub Action so verification runs
+        in CI on every archive you produce. Still zero dependencies, still nothing uploaded.</p>
+        <small>Turnaround: 1 week. Yours to keep and modify.</small>
+      </div>
+      <div class="tier">
+        <div class="price">$5,000</div>
+        <b>Storage pipeline integrity build</b>
+        <p>Verification wired into your ingest and retrieval path: block-level checks, Piece CID / CommP
+        re-computation, a failure report per deal, and alerting when an archive stops matching its CID.</p>
+        <small>Turnaround: 2&ndash;3 weeks, scoped in writing before anything is charged.</small>
+      </div>
+    </div>
+
+    <p class="buy"><a href="https://buymeacoffee.com/p32929">Start one &rarr;</a>
+    <span>Checkout is in units of $5, so pick the matching count (100 = $500, 300 = $1,500, 1000 = $5,000) and put
+    <code>CARCHECK-AUDIT</code>, <code>CARCHECK-SELFHOST</code> or <code>CARCHECK-PIPELINE</code> plus your email in
+    the message. I reply the same day and scope it in writing before any work starts.</span></p>
+  </section>
 
   <footer>
     Open source (MIT) — <a href="https://github.com/p32929/carcheck">github.com/p32929/carcheck</a>.
@@ -124,3 +171,4 @@ async function run(f) {
 </script>
 </body>
 </html>
+

@@ -1,40 +1,28 @@
 # carcheck
 
-**Verify an IPFS / Filecoin CAR file block-by-block, in your browser. Nothing is uploaded.**
+Check that an IPFS or Filecoin CAR file is not broken, block by block, right in your browser. Nothing is uploaded, and there are no third-party dependencies.
 
-▶ **[p32929.github.io/carcheck](https://p32929.github.io/carcheck/)**
+**Try it: [p32929.github.io/carcheck](https://p32929.github.io/carcheck/)**
 
-A `.car` (Content Addressable aRchive) is the file format Filecoin deals and IPFS exports
-travel in. Its whole promise is that every block is addressed by the hash of its own bytes —
-but nothing checks that promise for you. If a byte flips in transit, on disk, or in a
-retrieval, the file still *looks* fine.
-
-carcheck opens the archive and, for every single block, re-hashes the bytes and compares the
-result to the CID the block is filed under. It also checks that the root CID declared in the
-header is actually present in the file — the most common way a truncated or partial export
-fails silently.
+A `.car` file is the format Filecoin deals and IPFS exports travel in. Every block inside it is named by the hash of its own bytes, but nothing checks that for you. If a byte flips in transit, on disk or during a retrieval, the file still looks fine. carcheck re-hashes every block and tells you exactly which ones do not match.
 
 ## What it checks
 
-| Check | Why it matters |
-|---|---|
-| Every block's bytes re-hashed vs. its CID | Catches bit-rot, truncation and bad retrievals |
-| Root CID present in the file | Catches partial/incomplete exports |
-| CARv1 and CARv2 (pragma + inner v1) | CARv2 is what indexed exports use |
-| Varint framing and block lengths | Catches truncated and malformed archives |
-| Unsupported hashes are marked `skipped` | Never silently reports an unverified block as OK |
+1. **Every block:** it re-hashes the bytes and compares the result with the block's CID. This catches bit rot, cut-off files and bad retrievals.
+2. **The root CID:** it checks that the root named in the header is really inside the file. A missing root is the most common sign of a partial export.
+3. **CARv1 and CARv2:** both work, including the indexed CARv2 files many tools export.
+4. **The file structure:** it checks the length of every block, so truncated or malformed files are caught.
+5. **Honest results:** blocks it cannot check are marked `skipped`, never `ok`.
 
-Supported multihashes: `sha2-256`, `sha2-512`, `identity`. Blake2b blocks are listed and
-explicitly marked `skipped` rather than passed.
+Supported hashes are `sha2-256`, `sha2-512` and `identity`. Blocks hashed with `blake2b-256` are listed and marked `skipped`.
 
-## Why it's client-side
+## Why it runs in your browser
 
-CAR files are routinely gigabytes and routinely private. Uploading one to a web service to
-find out whether it is intact is both slow and a data-handling problem. carcheck is a single
-static page with no backend, no dependencies and no network calls — it works offline, and
-your data never leaves the tab.
+CAR files are often gigabytes in size and often private. Uploading one to a web service just to see if it is intact is slow, and it means handing your data to someone else. carcheck is one static page with no server, no dependencies and no network calls. It works offline and your file never leaves the tab.
 
-## Use it as a library
+## Use it in your own code
+
+The same module works in the browser and in Node.js 18 or newer.
 
 ```js
 import { verifyCar } from 'https://p32929.github.io/carcheck/carcheck.js';
@@ -44,9 +32,7 @@ console.log(r.stats);       // { total, ok, bad, skipped, bytes }
 console.log(r.roots, r.missingRoots, r.errors);
 ```
 
-Zero dependencies. The same module runs in Node (≥18) — see `test.js`.
-
-## Run the check
+## Run the test
 
 ```bash
 curl -L -H 'Accept: application/vnd.ipld.car' \
@@ -55,49 +41,20 @@ curl -L -H 'Accept: application/vnd.ipld.car' \
 node test.js test.car
 ```
 
-It parses the archive, asserts the recomputed CID matches the one requested, then flips a
-single byte and asserts the corruption is caught.
-
-## Paid work
-
-The tool is free (MIT) and stays that way. These are the things people pay me to do with it, fixed price, delivered end to end:
-
-| | What you get | Turnaround |
-|---|---|---|
-| **$500** | **Integrity audit** — send CIDs or a gateway/bucket URL, get every block and declared root verified and a signed report naming exactly what failed and why | 3 working days |
-| **$1,500** | **Self-hosted / white-label verifier** — carcheck under your name and domain, plus a Node CLI and a GitHub Action so CI verifies every archive you produce | 1 week |
-| **$5,000** | **Storage pipeline integrity build** — verification wired into ingest and retrieval: block checks, Piece CID / CommP re-computation, per-deal failure reports, alerting when an archive stops matching its CID | 2–3 weeks |
-
-Start one at **[buymeacoffee.com/p32929](https://buymeacoffee.com/p32929)** — checkout is in units of $5, so pick the
-matching count (100 = $500, 300 = $1,500, 1000 = $5,000) and put `CARCHECK-AUDIT`, `CARCHECK-SELFHOST` or
-`CARCHECK-PIPELINE` plus your email in the message. Everything is scoped in writing before any work starts.
+The test reads the file, checks that the CID it works out matches the one you asked for, then changes one byte and checks that carcheck catches it.
 
 ## License
 
-MIT © [p32929](https://github.com/p32929) — see [LICENSE](LICENSE).
+MIT License, Copyright (c) 2026 Fayaz Bin Salam. See [LICENSE](LICENSE) for the full text.
 
 ## Contributing
 
-Contributions are warmly welcomed and greatly appreciated! Whether it's a bug fix, new feature, or improvement, your input helps make this project better for everyone.
-
-Before submitting a pull request, please:
-
-1. Create an issue describing the feature or bug fix you'd like to work on
-2. Wait for discussion and approval to ensure alignment with project goals
-3. Fork the repository and create your feature branch
-4. Submit your pull request with a clear description of changes
-
-This approach helps avoid duplicate efforts and ensures smooth collaboration. Thank you for considering contributing!
+Contributions are very welcome, thank you! Before you start on a pull request, please open an issue and tell me what you would like to add or change. That way we can agree on it first, and your time is not spent on something that might not fit. Thanks for helping make carcheck better.
 
 ## Share
 
-Sharing this repository with your friends is just one click away from here
+<a href="https://p32929.github.io/share/?repo=carcheck"><img src="https://p32929.github.io/readme/share.svg" alt="Share this with your friends in just a click" width="420"></a>
 
-[![facebook](https://user-images.githubusercontent.com/6418354/179013321-ac1d1452-0689-493f-9066-940cf2302b6e.png)](https://www.facebook.com/sharer/sharer.php?u=https://github.com/p32929/carcheck/)
-[![twitter](https://user-images.githubusercontent.com/6418354/179013351-7d8d6d1c-4ce2-46ab-bef8-4c4765a1b888.png)](https://twitter.com/intent/tweet?url=https://github.com/p32929/carcheck/)
-[![tumblr](https://user-images.githubusercontent.com/6418354/179013343-3111f55a-3b90-40c7-8487-9777348672b0.png)](https://www.tumblr.com/share?v=3&u=https://github.com/p32929/carcheck/)
-[![pocket](https://user-images.githubusercontent.com/6418354/179013334-b095c45f-becf-49f4-9ee1-5a731a9b1f85.png)](https://getpocket.com/save?url=https://github.com/p32929/carcheck/)
-[![pinterest](https://user-images.githubusercontent.com/6418354/179013331-44cd9206-11b1-4b65-becb-5863b61c828f.png)](https://pinterest.com/pin/create/button/?url=https://github.com/p32929/carcheck/)
-[![reddit](https://user-images.githubusercontent.com/6418354/179013338-7416ae3f-73ba-4522-86e1-1374d7082d22.png)](https://www.reddit.com/submit?url=https://github.com/p32929/carcheck/)
-[![linkedin](https://user-images.githubusercontent.com/6418354/179013327-ca7b7102-1da8-4b1c-858f-1a6e5f21bd70.png)](https://www.linkedin.com/shareArticle?mini=true&url=https://github.com/p32929/carcheck/)
-[![whatsapp](https://user-images.githubusercontent.com/6418354/179013353-f477fa0b-3e6f-4138-a357-c9991b23ff88.png)](https://api.whatsapp.com/send?text=https://github.com/p32929/carcheck/)
+## Support
+
+<a href="https://p32929.github.io/support/"><img src="https://p32929.github.io/readme/support.svg" alt="If you like my works and want to support me, feel free to support" width="420"></a>
